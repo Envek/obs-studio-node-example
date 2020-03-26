@@ -1,7 +1,6 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('path');
 
-
 // Following code is from here (nothing interesting): https://www.electronjs.org/docs/tutorial/first-app
 
 function createWindow () {

@@ -81,8 +81,9 @@ function sleep(ms) {
 }
 
 function createSource() {
-    const source = osn.InputFactory.create(EOBSInputTypes.MonitorCapture, 'test-source')
-    
+    const videoSource = osn.InputFactory.create(EOBSInputTypes.MonitorCapture, 'desktop-video')
+    const audioSource = osn.InputFactory.create(EOBSInputTypes.WASAPIOutput, 'desktop-audio')
+    const micSource = osn.InputFactory.create(EOBSInputTypes.WASAPIInput, 'mic-audio')
     // How to update settings:
     // let settings = source.settings;
     // const primaryDisplay = remote.screen.getPrimaryDisplay();
@@ -92,13 +93,15 @@ function createSource() {
     // source.save();
 
 
-    // If a scene is needed:
+    // A scene doesn't seem necessary here, but if a scene is needed:
     // const scene = osn.SceneFactory.create('test-scene');
     // const sceneItem = scene.add(source)
     // console.log(sceneItem)
 
-    // Tell recorder to use this source (I'm not sure what the first argument `channel` does)
-    osn.Global.setOutputSource(1, source)
+    // Tell recorder to use this source (I'm not sure if this is the correct way to use the first argument `channel`)
+    osn.Global.setOutputSource(1, videoSource)
+    osn.Global.setOutputSource(2, audioSource)
+    osn.Global.setOutputSource(3, micSource)
 }
 
 async function record() {

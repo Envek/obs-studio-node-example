@@ -1,8 +1,27 @@
 const path = require('path');
 const { Subject } = require('rxjs');
 const { first } = require('rxjs/operators');
+const { remote } = require('electron');
 
 const osn = require("obs-studio-node");
+
+const EOBSInputTypes = {
+    AudioLine: 'audio_line',
+    ImageSource: 'image_source',
+    ColorSource: 'color_source',
+    Slideshow: 'slideshow',
+    BrowserSource: 'browser_source',
+    FFMPEGSource: 'ffmpeg_source',
+    TextGDI: 'text_gdiplus',
+    TextFT2: 'text_ft2_source',
+    VLCSource: 'vlc_source',
+    MonitorCapture: 'monitor_capture',
+    WindowCapture: 'window_capture',
+    GameCapture: 'game_capture',
+    DShowInput: 'dshow_input',
+    WASAPIInput: 'wasapi_input_capture',
+    WASAPIOutput: 'wasapi_output_capture'
+}
 
 function setSetting(category, parameter, value) {
     let oldValue;
@@ -45,6 +64,7 @@ function init() {
   setSetting('Output', 'Mode', 'Simple');
   setSetting('Output', 'StreamEncoder', 'x264');
   setSetting('Output', 'FilePath', path.join(__dirname, 'videos'));
+  setSetting('Output', 'RecFormat', 'mkv')
 
   console.log('OBS Initialized');
 }
@@ -58,6 +78,27 @@ function getNextSignalInfo() {
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function createSource() {
+    const source = osn.InputFactory.create(EOBSInputTypes.MonitorCapture, 'test-source')
+    
+    // How to update settings:
+    // let settings = source.settings;
+    // const primaryDisplay = remote.screen.getPrimaryDisplay();
+    // settings['height'] = primaryDisplay.size.height * 2;
+    // settings['width'] = primaryDisplay.size.width * 2;
+    // source.update(settings)
+    // source.save();
+
+
+    // If a scene is needed:
+    // const scene = osn.SceneFactory.create('test-scene');
+    // const sceneItem = scene.add(source)
+    // console.log(sceneItem)
+
+    // Tell recorder to use this source (I'm not sure what the first argument `channel` does)
+    osn.Global.setOutputSource(1, source)
 }
 
 async function record() {
@@ -78,7 +119,7 @@ async function record() {
     console.log('Started signalInfo.signal:', signalInfo.signal, '(expected: "start")');
 
     // Recording...
-    await sleep(2500);
+    await sleep(30000);
 
     // Stopping...
     osn.NodeObs.OBS_service_stopRecording();
@@ -111,7 +152,7 @@ function shutdown() {
 
 try {
   init();
-
+  createSource();
   record().then(shutdown);
 } catch (err) {
   console.log(err)

@@ -55,6 +55,20 @@ function init() {
   const obsDataPath = path.join(__dirname, 'osn-data'); // OBS Studio configs and logs
   const initResult = osn.NodeObs.OBS_API_initAPI('en-US', obsDataPath, "1.1.4");
 
+  if (initResult !== 0) {
+    const errorReasons = {
+      '-2': "DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.",
+      '-5': "Failed to initialize OBS. Your video drivers may be out of date, or Streamlabs OBS may not be supported on your system.",
+    }
+
+    remote.dialog.showErrorBox('OBS init failure', errorReasons[initResult.toString()] || "An unknown error was encountered while initializing OBS.");
+
+    shutdown();
+    remote.app.quit();
+
+    return;
+  }
+
   console.log('OBS Init result: ', initResult); // Should be 0 (Success)
 
   osn.NodeObs.OBS_service_connectOutputSignals((signalInfo) => {

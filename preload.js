@@ -87,22 +87,33 @@ function createSource() {
     const videoSource = osn.InputFactory.create(EOBSInputTypes.MonitorCapture, 'desktop-video')
     const audioSource = osn.InputFactory.create(EOBSInputTypes.WASAPIOutput, 'desktop-audio')
     const micSource = osn.InputFactory.create(EOBSInputTypes.WASAPIInput, 'mic-audio')
-    // How to update settings:
-    // let settings = source.settings;
-    // const primaryDisplay = remote.screen.getPrimaryDisplay();
-    // settings['height'] = primaryDisplay.size.height * 2;
-    // settings['width'] = primaryDisplay.size.width * 2;
-    // source.update(settings)
-    // source.save();
 
+    // Get information about prinary display
+    const primaryDisplay = remote.screen.getPrimaryDisplay();
+    const realDisplayWidth = primaryDisplay.size.width * primaryDisplay.scaleFactor;
+    const realDisplayHeight = primaryDisplay.size.height * primaryDisplay.scaleFactor;
+    const aspectRatio = realDisplayWidth / realDisplayHeight;
 
-    // A scene doesn't seem necessary here, but if a scene is needed:
-    // const scene = osn.SceneFactory.create('test-scene');
-    // const sceneItem = scene.add(source)
-    // console.log(sceneItem)
+    // Update source settings:
+    let settings = videoSource.settings;
+    settings['width'] = realDisplayWidth;
+    settings['height'] = realDisplayHeight;
+    videoSource.update(settings);
+    videoSource.save();
+
+    // Set output video size to 1920x1080
+    const outputWidth = 1920;
+    setSetting('Video', 'OutputCX', outputWidth)
+    setSetting('Video', 'OutputCY', Math.round(outputWidth / aspectRatio))
+    const videoScaleFactor = realDisplayWidth / outputWidth;
+
+    // A scene is necessary here to properly scale captured screen size to output video size
+    const scene = osn.SceneFactory.create('test-scene');
+    const sceneItem = scene.add(videoSource)
+    sceneItem.scale = { x: 1.0/ videoScaleFactor, y: 1.0 / videoScaleFactor }
 
     // Tell recorder to use this source (I'm not sure if this is the correct way to use the first argument `channel`)
-    osn.Global.setOutputSource(1, videoSource)
+    osn.Global.setOutputSource(1, scene)
     osn.Global.setOutputSource(2, audioSource)
     osn.Global.setOutputSource(3, micSource)
 }

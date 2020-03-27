@@ -1,4 +1,4 @@
-# (Not yet working) example of [obs-studio-node] usage
+# Very simple example of [obs-studio-node] usage
 
 ## Setup
 
@@ -16,15 +16,11 @@ or use `F5` in Visual Studio Code.
 
 ## Current state
 
-It segfaults on call to `NodeObs.OBS_service_startRecording()` but `obs64.exe` is continuing to run while writing a ton of following messages to its logs:
+It launches and writes 30 seconds of your desktop video, audio, and microphone to the video file in `videos/` subfolder. Look at console output in the Dev Tools.
 
-```
-[Error] WriteFileEx failed with getErrorCode 232
-```
+See [this topic](https://obsproject.com/forum/threads/laptop-black-screen-when-capturing-read-here-first.5965/) on how to solve black screen on laptops with two video cards.
 
-I tried to change output folder for videos, to run it with administrator rights,  to upgrade drivers and codecs. But with no luck yet.
-
-Most probably I miss some steps in initialization.
+Works only on Windows.
 
 ## Misc
 

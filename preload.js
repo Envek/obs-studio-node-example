@@ -28,6 +28,7 @@ function setSetting(category, parameter, value) {
 
     // Getting settings container
     const settings = osn.NodeObs.OBS_settings_getSettings(category).data;
+    console.log(settings)
 
     settings.forEach(subCategory => {
         subCategory.parameters.forEach(param => {
@@ -62,9 +63,11 @@ function init() {
 
   console.log('Configuring OBS');
   setSetting('Output', 'Mode', 'Simple');
-  setSetting('Output', 'StreamEncoder', 'x264');
+  setSetting('Output', 'StreamEncoder', 'nvenc');
   setSetting('Output', 'FilePath', path.join(__dirname, 'videos'));
   setSetting('Output', 'RecFormat', 'mkv')
+  setSetting('Output', 'VBitrate', 10000) // 10 Mbps
+  setSetting('Video', 'FPSCommon', 60)
 
   console.log('OBS Initialized');
 }

@@ -168,12 +168,20 @@ async function record() {
     console.log('Stopped?');
 }
 
+let obsShutdownComplete = false;
+
 function shutdown() {
+  if (obsShutdownComplete) {
+    console.log('OBS is already shut down!');
+    return;
+  }
+
   console.log('Shutting down OBS');
 
   try {
       osn.NodeObs.OBS_service_removeCallback();
       osn.NodeObs.IPC.disconnect();
+      obsShutdownComplete = true;
   } catch(e) {
       throw Error('Exception when shutting down OBS process' + e);
   }
@@ -181,10 +189,16 @@ function shutdown() {
   console.log('OBS shutdown successfully');
 }
 
+// Shutdown OBS on usual window close
+remote.getCurrentWindow().on('close', shutdown);
+
+// Shutdown OBS when computer is going to shutdown or user is logging of
+remote.getCurrentWindow().on('session-end', shutdown);
+
 try {
   init();
   createSource();
-  record().then(shutdown);
+  record();
 } catch (err) {
   console.log(err)
 }

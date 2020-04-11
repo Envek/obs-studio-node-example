@@ -1,5 +1,26 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path');
+
+const obsRecorder = require('./obsRecorder');
+
+// Replace with ipcMain.handle when obs-studio-node will be ready to work on recent versions of Electron.
+// See https://github.com/stream-labs/obs-studio-node/issues/605
+ipcMain.on('recording-init', (event) => {
+  obsRecorder.initialize();
+  event.returnValue = true;
+});
+
+ipcMain.on('recording-start', (event) => {
+  obsRecorder.start();
+  event.returnValue = { recording: true };
+});
+
+ipcMain.on('recording-stop', (event) => {
+  obsRecorder.stop();
+  event.returnValue = { recording: false };
+});
+
+app.on('will-quit', obsRecorder.shutdown);
 
 // Following code is from here (nothing interesting): https://www.electronjs.org/docs/tutorial/first-app
 

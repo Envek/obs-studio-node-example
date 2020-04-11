@@ -1,5 +1,5 @@
 {
-  "name": "obs-studio-node-usage-test",
+  "name": "obs-studio-node-example",
   "version": "1.0.0",
   "description": "Electron and OBS together. As simple as possible.",
   "main": "index.js",

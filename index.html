@@ -7,9 +7,22 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
   </head>
   <body>
-    <h1>Hello World!</h1>
+    <h1>Hello from OBS Studio Node!</h1>
+
+    <button id="rec-button" onclick="switchRecording()">
+      ⏳ Initializing, please wait...
+    </button>
+
+    <span id="rec-timer">0:00:00.0</span>
+
+    <button title="Open folder with videos" onclick="openFolder()">📂</button>
+
+    <pre>
     We are using node <script>document.write(process.versions.node)</script>,
     Chrome <script>document.write(process.versions.chrome)</script>,
     and Electron <script>document.write(process.versions.electron)</script>.
+    </pre>
+
+    <script src="./renderer.js"></script>
   </body>
 </html>

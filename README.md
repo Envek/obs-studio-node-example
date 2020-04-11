@@ -16,11 +16,32 @@ or use `F5` in Visual Studio Code.
 
 ## Current state
 
-It launches and writes 30 seconds of your desktop video, audio, and microphone to the video file in `videos/` subfolder. Look at console output in the Dev Tools.
+It launches, initializes OBS Studio and lets you press "Start recording" button. On recording it captures your desktop video, audio, and microphone to the video file in `videos/` subfolder. Look at main process' console output.
 
 See [this topic](https://obsproject.com/forum/threads/laptop-black-screen-when-capturing-read-here-first.5965/) on how to solve black screen on laptops with two video cards.
 
-Works only on Windows.
+Out of the box it works only on Windows.
+
+## Code of interest
+
+Most of the interesting things are located in [`obsRecorder.js`](./obsRecorder.js). Some snippets are taken verbatim from [obs-studio-node] tests and [streamlabs-obs] source code, but some are results of experiments.
+
+## Run on MacOS
+
+Change link to [obs-studio-node] in your `package.json` to include version of package built for MacOS:
+
+```
+ "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.215-iojs-v6.0.3-osx-release.tar.gz",
+```
+
+And execute `yarn`:
+
+```sh
+yarn install
+```
+
+May be it will work, may be not.
+
 
 ## Use with your own build of [obs-studio-node]
 
@@ -63,4 +84,10 @@ Works only on Windows.
 
 OBS logs can be found in `osn-data\node-obs\logs`.
 
+## License
+
+As [OBS Studio] itself is published under the terms of GNU GPL version 2, [obs-studio-node] and all application that are using it (including this example application) also have to be open-sourced and published under the terms of GNU GPL version 2 or compatible license. [Read more on tldrlegal.com](https://tldrlegal.com/license/gnu-general-public-license-v2).
+
 [obs-studio-node]: https://github.com/stream-labs/obs-studio-node "libOBS (OBS Studio) for Node.JS, Electron and similar tools"
+[streamlabs-obs]: https://github.com/stream-labs/streamlabs-obs "Free and open source streaming software built on OBS and Electron"
+[OBS Studio]: https://obsproject.com/ "Open Broadcaster Software"

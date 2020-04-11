@@ -53,7 +53,8 @@ function initOBS() {
 function configureOBS() { 
   console.debug('Configuring OBS');
   setSetting('Output', 'Mode', 'Simple');
-  setSetting('Output', 'RecEncoder', 'nvenc'); // You can get available encoders from OBS itself at the same key
+  const availableEncoders = getAvailableValues('Output', 'Recording', 'RecEncoder');
+  setSetting('Output', 'RecEncoder', availableEncoders.slice(-1)[0]);
   setSetting('Output', 'FilePath', path.join(__dirname, 'videos'));
   setSetting('Output', 'RecFormat', 'mkv')
   setSetting('Output', 'VBitrate', 10000) // 10 Mbps
@@ -179,7 +180,14 @@ function setSetting(category, parameter, value) {
     osn.NodeObs.OBS_settings_saveSettings(category, settings);
   }
 }
-  
+
+function getAvailableValues(category, subcategory, parameter) {
+  const categorySettings = osn.NodeObs.OBS_settings_getSettings(category).data;
+  const subcategorySettings = categorySettings.find(sub => sub.nameSubCategory === subcategory);
+  const parameterSettings = subcategorySettings.parameters.find(param => param.name === parameter);
+  return parameterSettings.values.map( value => Object.values(value)[0]);
+}
+
 const signals = new Subject();
   
 function getNextSignalInfo() {

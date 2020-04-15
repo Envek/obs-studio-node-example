@@ -84,8 +84,9 @@ function setupSources() {
 
   // Set output video size to 1920x1080
   const outputWidth = 1920;
-  setSetting('Video', 'OutputCX', outputWidth)
-  setSetting('Video', 'OutputCY', Math.round(outputWidth / aspectRatio))
+  const outputHeight = Math.round(outputWidth / aspectRatio);
+  setSetting('Video', 'Base', `${outputWidth}x${outputHeight}`);
+  setSetting('Video', 'Output', `${outputWidth}x${outputHeight}`);
   const videoScaleFactor = realDisplayWidth / outputWidth;
 
   // A scene is necessary here to properly scale captured screen size to output video size

@@ -1,7 +1,6 @@
 const path = require('path');
 const { Subject } = require('rxjs');
 const { first } = require('rxjs/operators');
-const { ipcMain } = require('electron');
 
 const osn = require("obs-studio-node");
 

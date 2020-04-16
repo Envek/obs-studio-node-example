@@ -7,16 +7,20 @@ const osn = require("obs-studio-node");
 let obsInitialized = false;
 
 // Init the library, launch OBS Studio instance, configure it, set up sources and scene
-function initialize() {
+function initialize(webContents) {
   if (obsInitialized) {
     console.warn("OBS is already initialized, skipping initialization.");
-    return
+    return;
   }
 
   initOBS();
   configureOBS();
   setupSources();
   obsInitialized = true;
+
+  setInterval(() => {
+    webContents.send("performanceStatistics", osn.NodeObs.OBS_API_getPerformanceStatistics());
+  }, 1000);
 }
 
 function initOBS() {
@@ -56,17 +60,17 @@ function configureOBS() {
   const availableEncoders = getAvailableValues('Output', 'Recording', 'RecEncoder');
   setSetting('Output', 'RecEncoder', availableEncoders.slice(-1)[0] || 'x264');
   setSetting('Output', 'FilePath', path.join(__dirname, 'videos'));
-  setSetting('Output', 'RecFormat', 'mkv')
-  setSetting('Output', 'VBitrate', 10000) // 10 Mbps
-  setSetting('Video', 'FPSCommon', 60)
+  setSetting('Output', 'RecFormat', 'mkv');
+  setSetting('Output', 'VBitrate', 10000); // 10 Mbps
+  setSetting('Video', 'FPSCommon', 60);
 
   console.debug('OBS Configured');
 }
 
 function setupSources() {
-  const videoSource = osn.InputFactory.create('monitor_capture', 'desktop-video')
-  const audioSource = osn.InputFactory.create('wasapi_output_capture', 'desktop-audio')
-  const micSource = osn.InputFactory.create('wasapi_input_capture', 'mic-audio')
+  const videoSource = osn.InputFactory.create('monitor_capture', 'desktop-video');
+  const audioSource = osn.InputFactory.create('wasapi_output_capture', 'desktop-audio');
+  const micSource = osn.InputFactory.create('wasapi_input_capture', 'mic-audio');
 
   // Get information about prinary display
   const { screen } = require('electron');
@@ -91,13 +95,13 @@ function setupSources() {
 
   // A scene is necessary here to properly scale captured screen size to output video size
   const scene = osn.SceneFactory.create('test-scene');
-  const sceneItem = scene.add(videoSource)
-  sceneItem.scale = { x: 1.0/ videoScaleFactor, y: 1.0 / videoScaleFactor }
+  const sceneItem = scene.add(videoSource);
+  sceneItem.scale = { x: 1.0/ videoScaleFactor, y: 1.0 / videoScaleFactor };
 
   // Tell recorder to use this source (I'm not sure if this is the correct way to use the first argument `channel`)
-  osn.Global.setOutputSource(1, scene)
-  osn.Global.setOutputSource(2, audioSource)
-  osn.Global.setOutputSource(3, micSource)
+  osn.Global.setOutputSource(1, scene);
+  osn.Global.setOutputSource(2, audioSource);
+  osn.Global.setOutputSource(3, micSource);
 }
 
 async function start() {

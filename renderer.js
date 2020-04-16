@@ -6,6 +6,9 @@ function initOBS() {
   // See https://github.com/stream-labs/obs-studio-node/issues/605
   const result = ipcRenderer.sendSync('recording-init');
   console.debug("initOBS result:", result);
+  if (result) {
+    ipcRenderer.on("performanceStatistics", (_event, data) => onPerformanceStatistics(data));
+  }
 }
 
 function startRecording() {
@@ -66,6 +69,15 @@ function updateTimer() {
 
 function openFolder() {
   shell.openItem(path.join(__dirname, 'videos'));
+}
+
+function onPerformanceStatistics(data) {
+  document.querySelector(".performanceStatistics #cpu").innerText = `${data.CPU} %`;
+  document.querySelector(".performanceStatistics #cpuMeter").value = data.CPU;
+  document.querySelector(".performanceStatistics #numberDroppedFrames").innerText = data.numberDroppedFrames;
+  document.querySelector(".performanceStatistics #percentageDroppedFrames").innerText = `${data.percentageDroppedFrames} %`;
+  document.querySelector(".performanceStatistics #bandwidth").innerText = data.bandwidth;
+  document.querySelector(".performanceStatistics #frameRate").innerText = `${Math.round(data.frameRate)} fps`;
 }
 
 try {

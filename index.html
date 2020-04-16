@@ -5,6 +5,18 @@
     <title>Hello World!</title>
     <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <style>
+      .performanceStatistics {
+        margin-top: 5rem;
+        margin-bottom: 5rem;
+        border-collapse: collapse;
+      }
+      .performanceStatistics tr,td {
+        border-bottom: 1px solid rgb(165, 165, 165);
+        border-top: 1px solid rgb(165, 165, 165);
+        padding: .5rem;
+      }
+    </style>
   </head>
   <body>
     <h1>Hello from OBS Studio Node!</h1>
@@ -16,6 +28,32 @@
     <span id="rec-timer">0:00:00.0</span>
 
     <button title="Open folder with videos" onclick="openFolder()">📂</button>
+
+    <table class="performanceStatistics">
+      <tr>
+        <td>CPU</td>
+        <td>
+          <meter id="cpuMeter" value="0" min="0" optimum="50" low="65" high="80" max="100"></meter>
+          <span id="cpu">Loading...</span>
+        </td>
+      </tr>
+      <tr>
+        <td>Dropped frames</td>
+        <td id="numberDroppedFrames">Loading...</td>
+      </tr>
+      <tr>
+        <td>Dropped frames</td>
+        <td id="percentageDroppedFrames">Loading...</td>
+      </tr>
+      <tr>
+        <td>Bandwidth</td>
+        <td id="bandwidth">Loading...</td>
+      </tr>
+      <tr>
+        <td>Framerate</td>
+        <td id="frameRate">Loading...</td>
+      </tr>
+    </table>
 
     <pre>
     We are using node <script>document.write(process.versions.node)</script>,

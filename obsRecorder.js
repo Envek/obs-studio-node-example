@@ -3,6 +3,7 @@ const { Subject } = require('rxjs');
 const { first } = require('rxjs/operators');
 
 const osn = require("obs-studio-node");
+const { BrowserWindow } = require('electron');
 
 let obsInitialized = false;
 
@@ -18,6 +19,23 @@ function initialize(webContents) {
   setupSources();
   obsInitialized = true;
 
+  const displayId = 'display1';
+  const displayWidth = 960;
+  const displayHeight = 540;
+
+  var cameraWindow = new BrowserWindow({
+    width: displayWidth,
+    height: displayHeight,
+  });
+
+  osn.NodeObs.OBS_content_createSourcePreviewDisplay(
+    cameraWindow.getNativeWindowHandle(),
+    "", // or use camera source Id here
+    displayId,
+  );
+  osn.NodeObs.OBS_content_setShouldDrawUI(displayId, false);
+  osn.NodeObs.OBS_content_resizeDisplay(displayId, displayWidth, displayHeight);
+	
   setInterval(() => {
     webContents.send("performanceStatistics", osn.NodeObs.OBS_API_getPerformanceStatistics());
   }, 1000);

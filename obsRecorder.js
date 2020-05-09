@@ -16,8 +16,9 @@ function initialize(win) {
 
   initOBS();
   configureOBS();
-  setupSources();
-  setupPreviewWindow(win);
+  const sceneName = 'test-scene';
+  setupSources(sceneName);
+  setupPreviewWindow(win, sceneName);
   obsInitialized = true;
 
   setInterval(() => {
@@ -69,7 +70,7 @@ function configureOBS() {
   console.debug('OBS Configured');
 }
 
-function setupSources() {
+function setupSources(sceneName) {
   const videoSource = osn.InputFactory.create('monitor_capture', 'desktop-video');
   const audioSource = osn.InputFactory.create('wasapi_output_capture', 'desktop-audio');
   const micSource = osn.InputFactory.create('wasapi_input_capture', 'mic-audio');
@@ -96,7 +97,7 @@ function setupSources() {
   const videoScaleFactor = realDisplayWidth / outputWidth;
 
   // A scene is necessary here to properly scale captured screen size to output video size
-  const scene = osn.SceneFactory.create('test-scene');
+  const scene = osn.SceneFactory.create(sceneName);
   const sceneItem = scene.add(videoSource);
   sceneItem.scale = { x: 1.0/ videoScaleFactor, y: 1.0 / videoScaleFactor };
 
@@ -106,7 +107,7 @@ function setupSources() {
   osn.Global.setOutputSource(3, micSource);
 }
 
-function setupPreviewWindow(parentWindow) {
+function setupPreviewWindow(parentWindow, sceneName) {
 	const displayId = 'display1';
   const displayWidth = 960;
   const displayHeight = 540;
@@ -119,7 +120,7 @@ function setupPreviewWindow(parentWindow) {
 
   osn.NodeObs.OBS_content_createSourcePreviewDisplay(
     cameraWindow.getNativeWindowHandle(),
-    "", // or use camera source Id here
+    sceneName, // or use camera source Id here
     displayId,
   );
   osn.NodeObs.OBS_content_setShouldDrawUI(displayId, false);

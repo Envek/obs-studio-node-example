@@ -22,7 +22,9 @@ function initialize(win) {
   obsInitialized = true;
 
   setInterval(() => {
-    win.webContents.send("performanceStatistics", osn.NodeObs.OBS_API_getPerformanceStatistics());
+	try {
+	  win.webContents.send("performanceStatistics", osn.NodeObs.OBS_API_getPerformanceStatistics());
+	} catch {}
   }, 1000);
 }
 

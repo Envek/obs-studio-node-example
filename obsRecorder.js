@@ -8,7 +8,7 @@ const { BrowserWindow } = require('electron');
 let obsInitialized = false;
 
 // Init the library, launch OBS Studio instance, configure it, set up sources and scene
-function initialize(webContents) {
+function initialize(win) {
   if (obsInitialized) {
     console.warn("OBS is already initialized, skipping initialization.");
     return;
@@ -17,27 +17,11 @@ function initialize(webContents) {
   initOBS();
   configureOBS();
   setupSources();
+  setupPreviewWindow(win);
   obsInitialized = true;
 
-  const displayId = 'display1';
-  const displayWidth = 960;
-  const displayHeight = 540;
-
-  var cameraWindow = new BrowserWindow({
-    width: displayWidth,
-    height: displayHeight,
-  });
-
-  osn.NodeObs.OBS_content_createSourcePreviewDisplay(
-    cameraWindow.getNativeWindowHandle(),
-    "", // or use camera source Id here
-    displayId,
-  );
-  osn.NodeObs.OBS_content_setShouldDrawUI(displayId, false);
-  osn.NodeObs.OBS_content_resizeDisplay(displayId, displayWidth, displayHeight);
-	
   setInterval(() => {
-    webContents.send("performanceStatistics", osn.NodeObs.OBS_API_getPerformanceStatistics());
+    win.webContents.send("performanceStatistics", osn.NodeObs.OBS_API_getPerformanceStatistics());
   }, 1000);
 }
 
@@ -120,6 +104,26 @@ function setupSources() {
   osn.Global.setOutputSource(1, scene);
   osn.Global.setOutputSource(2, audioSource);
   osn.Global.setOutputSource(3, micSource);
+}
+
+function setupPreviewWindow(parentWindow) {
+	const displayId = 'display1';
+  const displayWidth = 960;
+  const displayHeight = 540;
+
+  var cameraWindow = new BrowserWindow({
+    width: displayWidth,
+    height: displayHeight,
+	parent: parentWindow,
+  });
+
+  osn.NodeObs.OBS_content_createSourcePreviewDisplay(
+    cameraWindow.getNativeWindowHandle(),
+    "", // or use camera source Id here
+    displayId,
+  );
+  osn.NodeObs.OBS_content_setShouldDrawUI(displayId, false);
+  osn.NodeObs.OBS_content_resizeDisplay(displayId, displayWidth, displayHeight);
 }
 
 async function start() {

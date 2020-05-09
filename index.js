@@ -30,7 +30,7 @@ function createWindow () {
   });
 
   ipcMain.on('recording-init', (event) => {
-    obsRecorder.initialize(win.webContents);
+    obsRecorder.initialize(win);
     event.returnValue = true;
   });
 

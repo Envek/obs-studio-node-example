@@ -72,22 +72,33 @@ function configureOBS() {
   console.debug('OBS Configured');
 }
 
+// Get information about prinary display
+function displayInfo() {
+  const { screen } = require('electron');
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.size;
+  const { scaleFactor } = primaryDisplay;
+  return {
+    width,
+    height,
+    scaleFactor:    scaleFactor,
+    aspectRatio:    width / height,
+    physicalWidth:  width * scaleFactor,
+    physicalHeight: height * scaleFactor,
+  }
+}
+
 function setupSources(sceneName) {
   const videoSource = osn.InputFactory.create('monitor_capture', 'desktop-video');
   const audioSource = osn.InputFactory.create('wasapi_output_capture', 'desktop-audio');
   const micSource = osn.InputFactory.create('wasapi_input_capture', 'mic-audio');
 
-  // Get information about prinary display
-  const { screen } = require('electron');
-  const primaryDisplay = screen.getPrimaryDisplay();
-  const realDisplayWidth = primaryDisplay.size.width * primaryDisplay.scaleFactor;
-  const realDisplayHeight = primaryDisplay.size.height * primaryDisplay.scaleFactor;
-  const aspectRatio = realDisplayWidth / realDisplayHeight;
+  const { physicalWidth, physicalHeight, aspectRatio } = displayInfo();
 
   // Update source settings:
   let settings = videoSource.settings;
-  settings['width'] = realDisplayWidth;
-  settings['height'] = realDisplayHeight;
+  settings['width'] = physicalWidth;
+  settings['height'] = physicalHeight;
   videoSource.update(settings);
   videoSource.save();
 
@@ -96,7 +107,7 @@ function setupSources(sceneName) {
   const outputHeight = Math.round(outputWidth / aspectRatio);
   setSetting('Video', 'Base', `${outputWidth}x${outputHeight}`);
   setSetting('Video', 'Output', `${outputWidth}x${outputHeight}`);
-  const videoScaleFactor = realDisplayWidth / outputWidth;
+  const videoScaleFactor = physicalWidth / outputWidth;
 
   // A scene is necessary here to properly scale captured screen size to output video size
   const scene = osn.SceneFactory.create(sceneName);
@@ -110,15 +121,19 @@ function setupSources(sceneName) {
 }
 
 function setupPreviewWindow(parentWindow, sceneName) {
-	const displayId = 'display1';
-  const displayWidth = 960;
-  const displayHeight = 540;
+  const { aspectRatio, scaleFactor } = displayInfo();
+  const displayId = 'display1';
+  const displayWidth = 800;
+  const displayHeight = Math.round(displayWidth / aspectRatio);
 
   var cameraWindow = new BrowserWindow({
     width: displayWidth,
     height: displayHeight,
-	parent: parentWindow,
+    parent: parentWindow,
+    useContentSize: true,
+    backgroundColor: '#000000',
   });
+  cameraWindow.setAspectRatio(aspectRatio);
 
   osn.NodeObs.OBS_content_createSourcePreviewDisplay(
     cameraWindow.getNativeWindowHandle(),
@@ -126,7 +141,12 @@ function setupPreviewWindow(parentWindow, sceneName) {
     displayId,
   );
   osn.NodeObs.OBS_content_setShouldDrawUI(displayId, false);
-  osn.NodeObs.OBS_content_resizeDisplay(displayId, displayWidth, displayHeight);
+  osn.NodeObs.OBS_content_resizeDisplay(displayId, displayWidth * scaleFactor, displayHeight * scaleFactor);
+
+  cameraWindow.on('resize', (_event) => {
+    const [ width, height ] = cameraWindow.getContentSize();
+    osn.NodeObs.OBS_content_resizeDisplay(displayId, width * scaleFactor, height * scaleFactor);
+  });
 }
 
 async function start() {

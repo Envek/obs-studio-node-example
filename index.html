@@ -6,9 +6,12 @@
     <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     <style>
+      #preview {
+        margin-top: 2rem;
+      }
       .performanceStatistics {
-        margin-top: 5rem;
-        margin-bottom: 5rem;
+        margin-top: 2rem;
+        margin-bottom: 3rem;
         border-collapse: collapse;
       }
       .performanceStatistics tr,td {
@@ -28,6 +31,10 @@
     <span id="rec-timer">0:00:00.0</span>
 
     <button title="Open folder with videos" onclick="openFolder()">📂</button>
+
+    <div id="preview">
+      Initializing...
+    </div>
 
     <table class="performanceStatistics">
       <tr>

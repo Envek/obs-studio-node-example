@@ -17,13 +17,12 @@ ipcMain.on('recording-stop', (event) => {
 
 app.on('will-quit', obsRecorder.shutdown);
 
-// Following code is from here (nothing interesting): https://www.electronjs.org/docs/tutorial/first-app
-
 function createWindow () {
   // Create the browser window.
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true
     }
@@ -32,6 +31,14 @@ function createWindow () {
   ipcMain.on('recording-init', (event) => {
     obsRecorder.initialize(win);
     event.returnValue = true;
+  });
+
+  ipcMain.on('preview-init', (event, bounds) => {
+    event.returnValue = obsRecorder.setupPreview(win, bounds);
+  });
+
+  ipcMain.on('preview-bounds', (event, bounds) => {
+    event.returnValue = obsRecorder.resizePreview(bounds);
   });
 
   // and load the index.html of the app.

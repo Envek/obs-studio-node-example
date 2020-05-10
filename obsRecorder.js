@@ -6,6 +6,7 @@ const osn = require("obs-studio-node");
 const { BrowserWindow } = require('electron');
 
 let obsInitialized = false;
+let scene = null;
 
 // Init the library, launch OBS Studio instance, configure it, set up sources and scene
 function initialize(win) {
@@ -16,9 +17,8 @@ function initialize(win) {
 
   initOBS();
   configureOBS();
-  const sceneName = 'test-scene';
-  setupSources(sceneName);
-  setupPreviewWindow(win, sceneName);
+  scene = setupScene();
+  setupSources(scene);
   obsInitialized = true;
 
   const perfStatTimer = setInterval(() => {
@@ -88,10 +88,8 @@ function displayInfo() {
   }
 }
 
-function setupSources(sceneName) {
+function setupScene() {
   const videoSource = osn.InputFactory.create('monitor_capture', 'desktop-video');
-  const audioSource = osn.InputFactory.create('wasapi_output_capture', 'desktop-audio');
-  const micSource = osn.InputFactory.create('wasapi_input_capture', 'mic-audio');
 
   const { physicalWidth, physicalHeight, aspectRatio } = displayInfo();
 
@@ -110,9 +108,16 @@ function setupSources(sceneName) {
   const videoScaleFactor = physicalWidth / outputWidth;
 
   // A scene is necessary here to properly scale captured screen size to output video size
-  const scene = osn.SceneFactory.create(sceneName);
+  const scene = osn.SceneFactory.create('test-scene');
   const sceneItem = scene.add(videoSource);
   sceneItem.scale = { x: 1.0/ videoScaleFactor, y: 1.0 / videoScaleFactor };
+
+  return scene;
+}
+
+function setupSources() {
+  const audioSource = osn.InputFactory.create('wasapi_output_capture', 'desktop-audio');
+  const micSource = osn.InputFactory.create('wasapi_input_capture', 'mic-audio');
 
   // Tell recorder to use this source (I'm not sure if this is the correct way to use the first argument `channel`)
   osn.Global.setOutputSource(1, scene);
@@ -120,33 +125,30 @@ function setupSources(sceneName) {
   osn.Global.setOutputSource(3, micSource);
 }
 
-function setupPreviewWindow(parentWindow, sceneName) {
-  const { aspectRatio, scaleFactor } = displayInfo();
-  const displayId = 'display1';
-  const displayWidth = 800;
-  const displayHeight = Math.round(displayWidth / aspectRatio);
+const displayId = 'display1';
 
-  var cameraWindow = new BrowserWindow({
-    width: displayWidth,
-    height: displayHeight,
-    parent: parentWindow,
-    useContentSize: true,
-    backgroundColor: '#000000',
-  });
-  cameraWindow.setAspectRatio(aspectRatio);
-
+function setupPreview(window, bounds) {
   osn.NodeObs.OBS_content_createSourcePreviewDisplay(
-    cameraWindow.getNativeWindowHandle(),
-    sceneName, // or use camera source Id here
+    window.getNativeWindowHandle(),
+    scene.name, // or use camera source Id here
     displayId,
   );
   osn.NodeObs.OBS_content_setShouldDrawUI(displayId, false);
-  osn.NodeObs.OBS_content_resizeDisplay(displayId, displayWidth * scaleFactor, displayHeight * scaleFactor);
 
-  cameraWindow.on('resize', (_event) => {
-    const [ width, height ] = cameraWindow.getContentSize();
-    osn.NodeObs.OBS_content_resizeDisplay(displayId, width * scaleFactor, height * scaleFactor);
-  });
+  return resizePreview(bounds);
+}
+
+function resizePreview(bounds) {
+  const { aspectRatio, scaleFactor } = displayInfo();
+  const displayWidth = Math.floor(bounds.width);
+  const displayHeight = Math.round(displayWidth / aspectRatio);
+  const displayX = Math.floor(bounds.x);
+  const displayY = Math.floor(bounds.y);
+
+  osn.NodeObs.OBS_content_resizeDisplay(displayId, displayWidth * scaleFactor, displayHeight * scaleFactor);
+  osn.NodeObs.OBS_content_moveDisplay(displayId, displayX * scaleFactor, displayY * scaleFactor);
+
+  return { height: displayHeight }
 }
 
 async function start() {
@@ -266,3 +268,5 @@ module.exports.initialize = initialize;
 module.exports.start = start;
 module.exports.stop = stop;
 module.exports.shutdown = shutdown;
+module.exports.setupPreview = setupPreview;
+module.exports.resizePreview = resizePreview;

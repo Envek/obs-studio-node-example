@@ -1,4 +1,4 @@
-const { ipcRenderer, shell } = require('electron');
+const { ipcRenderer, shell, remote } = require('electron');
 const path = require('path');
 
 function initOBS() {
@@ -80,8 +80,29 @@ function onPerformanceStatistics(data) {
   document.querySelector(".performanceStatistics #frameRate").innerText = `${Math.round(data.frameRate)} fps`;
 }
 
+const previewContainer = document.getElementById('preview');
+
+function setupPreview() {
+  const { width, height, x, y } = previewContainer.getBoundingClientRect();
+  const result = ipcRenderer.sendSync('preview-init', { width, height, x, y });
+  previewContainer.style = `height: ${result.height}px`;
+}
+
+function resizePreview() {
+  const { width, height, x, y } = previewContainer.getBoundingClientRect();
+  const result = ipcRenderer.sendSync('preview-bounds', { width, height, x, y });
+  previewContainer.style = `height: ${result.height}px`;
+}
+
+const currentWindow = remote.getCurrentWindow();
+currentWindow.on('resize', resizePreview);
+document.addEventListener("scroll",  resizePreview);
+var ro = new ResizeObserver(resizePreview);
+ro.observe(document.querySelector("#preview"));
+
 try {
   initOBS();
+  setupPreview();
   updateUI();
 } catch (err) {
   console.log(err)

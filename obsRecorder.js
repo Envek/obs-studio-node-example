@@ -21,11 +21,11 @@ function initialize(win) {
   setupPreviewWindow(win, sceneName);
   obsInitialized = true;
 
-  setInterval(() => {
-	try {
+  const perfStatTimer = setInterval(() => {
 	  win.webContents.send("performanceStatistics", osn.NodeObs.OBS_API_getPerformanceStatistics());
-	} catch {}
   }, 1000);
+
+  win.on('close', () => clearInterval(perfStatTimer));
 }
 
 function initOBS() {

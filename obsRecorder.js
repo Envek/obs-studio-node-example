@@ -188,6 +188,7 @@ function setupPreview(window, bounds) {
     displayId,
   );
   osn.NodeObs.OBS_content_setShouldDrawUI(displayId, false);
+  osn.NodeObs.OBS_content_setPaddingSize(displayId, 0);
   // Match padding color with main window background color
   osn.NodeObs.OBS_content_setPaddingColor(displayId, 255, 255, 255);
 

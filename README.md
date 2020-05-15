@@ -16,7 +16,9 @@ or use `F5` in Visual Studio Code.
 
 ## Current state
 
-It launches, initializes OBS Studio and lets you press "Start recording" button. On recording it captures your desktop video, audio, and microphone to the video file in `videos/` subfolder. Look at main process' console output.
+It launches, initializes OBS Studio and lets you press "Start recording" button. On recording it captures your desktop video, your webcam picture (if available), audio, and microphone to the video file in `videos/` subfolder. Look at main process' console output.
+
+![Example application screenshot](./screenshot.png)
 
 See [this topic](https://obsproject.com/forum/threads/laptop-black-screen-when-capturing-read-here-first.5965/) on how to solve black screen on laptops with two video cards.
 

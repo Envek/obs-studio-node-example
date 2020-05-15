@@ -88,6 +88,48 @@ function displayInfo() {
   }
 }
 
+function getCameraSource() {
+  console.debug('Trying to set up web camera...')
+
+  // Setup input without initializing any device just to get list of available ones
+  const dummyInput = osn.InputFactory.create('dshow_input', 'video', {
+    audio_device_id: 'does_not_exist',
+    video_device_id: 'does_not_exist',
+  });
+
+  const cameraItems = dummyInput.properties.get('video_device_id').details.items;
+
+  dummyInput.release();
+
+  if (cameraItems.length === 0) {
+    console.debug('No camera found!!')
+    return null;
+  }
+
+  const deviceId = cameraItems[0].value;
+  cameraItems[0].selected = true;
+  console.debug('cameraItems[0].name: ' + cameraItems[0].name);
+
+  const obsCameraInput = osn.InputFactory.create('dshow_input', 'video', {
+    video_device_id: deviceId,
+  });
+
+  // It's a hack to wait while device become initialized
+  while (obsCameraInput.width === 0) {
+    console.debug("Waiting while camera got initialized. obsCameraInput.width:", obsCameraInput.width);
+  }
+
+  // Way to update settings if needed:
+  // let settings = obsCameraInput.settings;
+  // console.debug('Camera settings:', obsCameraInput.settings);
+  // settings['width'] = 320;
+  // settings['height'] = 240;
+  // obsCameraInput.update(settings);
+  // obsCameraInput.save();
+
+  return obsCameraInput;
+}
+
 function setupScene() {
   const videoSource = osn.InputFactory.create('monitor_capture', 'desktop-video');
 
@@ -111,6 +153,18 @@ function setupScene() {
   const scene = osn.SceneFactory.create('test-scene');
   const sceneItem = scene.add(videoSource);
   sceneItem.scale = { x: 1.0/ videoScaleFactor, y: 1.0 / videoScaleFactor };
+
+  // If camera is available, make it 1/3 width of video and place it to right down corner of display
+  const cameraSource = getCameraSource();
+  if (cameraSource) {
+    const cameraItem = scene.add(cameraSource);
+    const cameraScaleFactor = 1.0 / (3.0 * cameraSource.width / outputWidth);
+    cameraItem.scale = { x: cameraScaleFactor, y: cameraScaleFactor };
+    cameraItem.position = {
+      x: outputWidth - cameraSource.width * cameraScaleFactor - outputWidth / 10,
+      y: outputHeight - cameraSource.height * cameraScaleFactor - outputHeight / 10,
+    };
+  }
 
   return scene;
 }

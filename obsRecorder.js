@@ -114,9 +114,20 @@ function getCameraSource() {
     video_device_id: deviceId,
   });
 
-  // It's a hack to wait while device become initialized
-  while (obsCameraInput.width === 0) {
-    console.debug("Waiting while camera got initialized. obsCameraInput.width:", obsCameraInput.width);
+  // It's a hack to wait a bit until device become initialized (maximum for 1 second)
+  // If you know proper way how to determine whether camera is working and how to subscribe for any events from it, create a pull request
+  // See discussion at https://github.com/Envek/obs-studio-node-example/issues/10
+  for (let i = 1; i <= 4; i++) {
+    if (obsCameraInput.width === 0) {
+      const waitMs = 100 * i;
+      console.debug(`Waiting for ${waitMs}ms until camera get initialized.`);
+      busySleep(waitMs); // We can't use async/await here
+    }
+  }
+
+  if (obsCameraInput.width === 0) {
+    console.debug(`Found camera "${cameraItems[0].name}" doesn't seem to work as its reported width is still zero.`);
+    return null;
   }
 
   // Way to update settings if needed:
@@ -319,6 +330,11 @@ function getNextSignalInfo() {
     signals.pipe(first()).subscribe(signalInfo => resolve(signalInfo));
     setTimeout(() => reject('Output signal timeout'), 30000);
   });
+}
+
+function busySleep(sleepDuration) {
+  var now = new Date().getTime();
+  while(new Date().getTime() < now + sleepDuration) { /* do nothing */ };
 }
 
 module.exports.initialize = initialize;

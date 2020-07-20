@@ -61,13 +61,17 @@ function initOBS() {
 
 function configureOBS() { 
   console.debug('Configuring OBS');
-  setSetting('Output', 'Mode', 'Simple');
+  setSetting('Output', 'Mode', 'Advanced');
   const availableEncoders = getAvailableValues('Output', 'Recording', 'RecEncoder');
   setSetting('Output', 'RecEncoder', availableEncoders.slice(-1)[0] || 'x264');
-  setSetting('Output', 'FilePath', path.join(__dirname, 'videos'));
+  setSetting('Output', 'RecFilePath', path.join(__dirname, 'videos'));
   setSetting('Output', 'RecFormat', 'mkv');
   setSetting('Output', 'VBitrate', 10000); // 10 Mbps
   setSetting('Video', 'FPSCommon', 60);
+  setSetting('Output', 'RecTracks', 7); // Bit mask of used tracks: 000111 to use first three (from available six)
+  setSetting('Output', 'Track1Name', 'Mixed: Desktop + Mic');
+  setSetting('Output', 'Track2Name', 'Desktop Audio');
+  setSetting('Output', 'Track3Name', 'Microphone');
 
   console.debug('OBS Configured');
 }
@@ -183,6 +187,10 @@ function setupScene() {
 function setupSources() {
   const audioSource = osn.InputFactory.create('wasapi_output_capture', 'desktop-audio');
   const micSource = osn.InputFactory.create('wasapi_input_capture', 'mic-audio');
+
+  // Mixing and track distribution
+  audioSource.audioMixers = 3 // Bit mask to output to only tracks 1 and 2: 011 in binary
+  micSource.audioMixers   = 5 // Bit mask to output to only tracks 1 and 3: 101 in binary
 
   // Tell recorder to use this source (I'm not sure if this is the correct way to use the first argument `channel`)
   osn.Global.setOutputSource(1, scene);

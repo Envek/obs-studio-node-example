@@ -68,10 +68,6 @@ function configureOBS() {
   setSetting('Output', 'RecFormat', 'mkv');
   setSetting('Output', 'VBitrate', 10000); // 10 Mbps
   setSetting('Video', 'FPSCommon', 60);
-  setSetting('Output', 'RecTracks', 7); // Bit mask of used tracks: 000111 to use first three (from available six)
-  setSetting('Output', 'Track1Name', 'Mixed: Desktop + Mic');
-  setSetting('Output', 'Track2Name', 'Desktop Audio');
-  setSetting('Output', 'Track3Name', 'Microphone');
 
   console.debug('OBS Configured');
 }
@@ -184,18 +180,40 @@ function setupScene() {
   return scene;
 }
 
+function getAudioDevices(type, subtype) {
+  const dummyDevice = osn.InputFactory.create(type, subtype, { device_id: 'does_not_exist' });
+  const devices = dummyDevice.properties.get('device_id').details.items.map(({ name, value }) => {
+    return { device_id: value, name,};
+  });
+  dummyDevice.release();
+  return devices;
+};
+
 function setupSources() {
-  const audioSource = osn.InputFactory.create('wasapi_output_capture', 'desktop-audio');
-  const micSource = osn.InputFactory.create('wasapi_input_capture', 'mic-audio');
-
-  // Mixing and track distribution
-  audioSource.audioMixers = 3 // Bit mask to output to only tracks 1 and 2: 011 in binary
-  micSource.audioMixers   = 5 // Bit mask to output to only tracks 1 and 3: 101 in binary
-
-  // Tell recorder to use this source (I'm not sure if this is the correct way to use the first argument `channel`)
   osn.Global.setOutputSource(1, scene);
-  osn.Global.setOutputSource(2, audioSource);
-  osn.Global.setOutputSource(3, micSource);
+
+  setSetting('Output', 'Track1Name', 'Mixed: all sources');
+  let currentTrack = 2;
+
+  getAudioDevices('wasapi_output_capture', 'desktop-audio').forEach(metadata => {
+    if (metadata.device_id === 'default') return;
+    const source = osn.InputFactory.create('wasapi_output_capture', 'desktop-audio', { device_id: metadata.device_id });
+    setSetting('Output', `Track${currentTrack}Name`, metadata.name);
+    source.audioMixers = 1 | (1 << currentTrack-1); // Bit mask to output to only tracks 1 and current track
+    osn.Global.setOutputSource(currentTrack, source);
+    currentTrack++;
+  });
+
+  getAudioDevices('wasapi_input_capture', 'mic-audio').forEach(metadata => {
+    if (metadata.device_id === 'default') return;
+    const source = osn.InputFactory.create('wasapi_input_capture', 'mic-audio', { device_id: metadata.device_id });
+    setSetting('Output', `Track${currentTrack}Name`, metadata.name);
+    source.audioMixers = 1 | (1 << currentTrack-1); // Bit mask to output to only tracks 1 and current track
+    osn.Global.setOutputSource(currentTrack, source);
+    currentTrack++;
+  });
+
+  setSetting('Output', 'RecTracks', parseInt('1'.repeat(currentTrack-1), 2)); // Bit mask of used tracks: 1111 to use first four (from available six)
 }
 
 const displayId = 'display1';

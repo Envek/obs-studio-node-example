@@ -4,8 +4,8 @@ const { first } = require('rxjs/operators');
 const { byOS, OS } = require('./operating-systems');
 
 const osn = require("obs-studio-node");
-const { BrowserWindow } = require('electron');
 const uuid = require('uuid/v4')
+
 let obsInitialized = false;
 let scene = null;
 
@@ -196,14 +196,7 @@ function setupScene() {
 }
 
 function getAudioDevices(type, subtype) {
-  const dummyDevice = osn.InputFactory.create(
-    byOS({ [OS.Windows]: 'wasapi_input_capture', [OS.Mac]: 'coreaudio_input_capture' }),
-    uuid(),
-    {
-      device_id: 'does_not_exist',
-    },
-  )
-
+  const dummyDevice = osn.InputFactory.create(type, subtype, { device_id: 'does_not_exist' });
   const devices = dummyDevice.properties.get('device_id').details.items.map(({ name, value }) => {
     return { device_id: value, name,};
   });

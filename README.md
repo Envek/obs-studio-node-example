@@ -36,7 +36,9 @@ Change link to [obs-studio-node] in your `package.json` to include version of pa
  "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.9.0-release-osx.tar.gz",
 ```
 
-And execute `yarn`:
+To get the latest url, clone [streamlabs-obs](https://github.com/stream-labs/streamlabs-obs), run `yarn install` and copy it from `package.json`
+
+Execute `yarn`:
 
 ```sh
 yarn install

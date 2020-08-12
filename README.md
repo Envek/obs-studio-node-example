@@ -33,7 +33,7 @@ Most of the interesting things are located in [`obsRecorder.js`](./obsRecorder.j
 Change link to [obs-studio-node] in your `package.json` to include version of package built for MacOS:
 
 ```
- "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.215-iojs-v6.0.3-osx-release.tar.gz",
+ "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.9.0-release-osx.tar.gz",
 ```
 
 And execute `yarn`:
@@ -41,9 +41,6 @@ And execute `yarn`:
 ```sh
 yarn install
 ```
-
-May be it will work, may be not.
-
 
 ## Use with your own build of [obs-studio-node]
 

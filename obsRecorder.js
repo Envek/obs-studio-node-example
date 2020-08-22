@@ -4,7 +4,7 @@ const { first } = require('rxjs/operators');
 const { byOS, OS } = require('./operating-systems');
 
 const osn = require("obs-studio-node");
-const uuid = require('uuid/v4')
+const { v4: uuid } = require('uuid');
 
 let obsInitialized = false;
 let scene = null;

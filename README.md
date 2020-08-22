@@ -33,10 +33,10 @@ Most of the interesting things are located in [`obsRecorder.js`](./obsRecorder.j
 Change link to [obs-studio-node] in your `package.json` to include version of package built for MacOS:
 
 ```
- "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.9.0-release-osx.tar.gz",
+ "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.9.5-release-osx.tar.gz",
 ```
 
-To get the latest url, clone [streamlabs-obs](https://github.com/stream-labs/streamlabs-obs), run `yarn install` and copy it from `package.json`
+To get the latest url, clone [streamlabs-obs](https://github.com/stream-labs/streamlabs-obs), run `yarn install` and copy it from the output.
 
 Execute `yarn`:
 

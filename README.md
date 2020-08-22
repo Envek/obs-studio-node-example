@@ -44,6 +44,8 @@ Execute `yarn`:
 yarn install
 ```
 
+Start the app from a native terminal, not an integrated terminal like VSCode's.
+
 ## Use with your own build of [obs-studio-node]
 
  1. Build it somewhere ([look at the docs first](https://github.com/stream-labs/obs-studio-node#building))

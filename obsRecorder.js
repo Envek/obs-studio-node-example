@@ -1,9 +1,10 @@
 const path = require('path');
 const { Subject } = require('rxjs');
 const { first } = require('rxjs/operators');
+const { byOS, OS } = require('./operating-systems');
 
 const osn = require("obs-studio-node");
-const { BrowserWindow } = require('electron');
+const { v4: uuid } = require('uuid');
 
 let obsInitialized = false;
 let scene = null;
@@ -30,7 +31,7 @@ function initialize(win) {
 
 function initOBS() {
   console.debug('Initializing OBS...');
-  osn.NodeObs.IPC.host('obs-studio-node-example'); // Usually some UUIDs go there
+  osn.NodeObs.IPC.host(`obs-studio-node-example-${uuid()}`);
   osn.NodeObs.SetWorkingDirectory(path.join(__dirname, 'node_modules', 'obs-studio-node'));
 
   const obsDataPath = path.join(__dirname, 'osn-data'); // OBS Studio configs and logs
@@ -59,7 +60,7 @@ function initOBS() {
   console.debug('OBS initialized');
 }
 
-function configureOBS() { 
+function configureOBS() {
   console.debug('Configuring OBS');
   setSetting('Output', 'Mode', 'Advanced');
   const availableEncoders = getAvailableValues('Output', 'Recording', 'RecEncoder');
@@ -92,12 +93,19 @@ function getCameraSource() {
   console.debug('Trying to set up web camera...')
 
   // Setup input without initializing any device just to get list of available ones
-  const dummyInput = osn.InputFactory.create('dshow_input', 'video', {
-    audio_device_id: 'does_not_exist',
-    video_device_id: 'does_not_exist',
+  const dummyInput = byOS({
+    [OS.Windows]: () =>
+      osn.InputFactory.create('dshow_input', 'video', {
+        audio_device_id: 'does_not_exist',
+        video_device_id: 'does_not_exist',
+      }),
+    [OS.Mac]: () =>
+      osn.InputFactory.create('av_capture_input', 'video', {
+        device: 'does_not_exist',
+      })
   });
 
-  const cameraItems = dummyInput.properties.get('video_device_id').details.items;
+  const cameraItems = dummyInput.properties.get(byOS({ [OS.Windows]: 'video_device_id', [OS.Mac]: 'device' })).details.items;
 
   dummyInput.release();
 
@@ -110,9 +118,16 @@ function getCameraSource() {
   cameraItems[0].selected = true;
   console.debug('cameraItems[0].name: ' + cameraItems[0].name);
 
-  const obsCameraInput = osn.InputFactory.create('dshow_input', 'video', {
-    video_device_id: deviceId,
-  });
+  const obsCameraInput = byOS({
+    [OS.Windows]: () =>
+      osn.InputFactory.create('dshow_input', 'video', {
+        video_device_id: deviceId,
+      }),
+    [OS.Mac]: () =>
+      osn.InputFactory.create('av_capture_input', 'video', {
+        device: deviceId,
+      }),
+  })
 
   // It's a hack to wait a bit until device become initialized (maximum for 1 second)
   // If you know proper way how to determine whether camera is working and how to subscribe for any events from it, create a pull request
@@ -142,7 +157,7 @@ function getCameraSource() {
 }
 
 function setupScene() {
-  const videoSource = osn.InputFactory.create('monitor_capture', 'desktop-video');
+  const videoSource = osn.InputFactory.create(byOS({ [OS.Windows]: 'monitor_capture', [OS.Mac]: 'display_capture' }), 'desktop-video');
 
   const { physicalWidth, physicalHeight, aspectRatio } = displayInfo();
 
@@ -195,18 +210,18 @@ function setupSources() {
   setSetting('Output', 'Track1Name', 'Mixed: all sources');
   let currentTrack = 2;
 
-  getAudioDevices('wasapi_output_capture', 'desktop-audio').forEach(metadata => {
+  getAudioDevices(byOS({ [OS.Windows]: 'wasapi_output_capture', [OS.Mac]: 'coreaudio_output_capture' }), 'desktop-audio').forEach(metadata => {
     if (metadata.device_id === 'default') return;
-    const source = osn.InputFactory.create('wasapi_output_capture', 'desktop-audio', { device_id: metadata.device_id });
+    const source = osn.InputFactory.create(byOS({ [OS.Windows]: 'wasapi_output_capture', [OS.Mac]: 'coreaudio_output_capture' }), 'desktop-audio', { device_id: metadata.device_id });
     setSetting('Output', `Track${currentTrack}Name`, metadata.name);
     source.audioMixers = 1 | (1 << currentTrack-1); // Bit mask to output to only tracks 1 and current track
     osn.Global.setOutputSource(currentTrack, source);
     currentTrack++;
   });
 
-  getAudioDevices('wasapi_input_capture', 'mic-audio').forEach(metadata => {
+  getAudioDevices(byOS({ [OS.Windows]: 'wasapi_input_capture', [OS.Mac]: 'coreaudio_input_capture' }), 'mic-audio').forEach(metadata => {
     if (metadata.device_id === 'default') return;
-    const source = osn.InputFactory.create('wasapi_input_capture', 'mic-audio', { device_id: metadata.device_id });
+    const source = osn.InputFactory.create(byOS({ [OS.Windows]: 'wasapi_input_capture', [OS.Mac]: 'coreaudio_input_capture' }), 'mic-audio', { device_id: metadata.device_id });
     setSetting('Output', `Track${currentTrack}Name`, metadata.name);
     source.audioMixers = 1 | (1 << currentTrack-1); // Bit mask to output to only tracks 1 and current track
     osn.Global.setOutputSource(currentTrack, source);
@@ -350,7 +365,7 @@ function getAvailableValues(category, subcategory, parameter) {
 }
 
 const signals = new Subject();
-  
+
 function getNextSignalInfo() {
   return new Promise((resolve, reject) => {
     signals.pipe(first()).subscribe(signalInfo => resolve(signalInfo));

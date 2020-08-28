@@ -1,5 +1,7 @@
 # Very simple example of [obs-studio-node] usage
 
+Out of the box it works only on Windows. For running it on MacOS see below: [Run on MacOS](#run-on-macos).
+
 ## Setup
 
 ```
@@ -22,8 +24,6 @@ It launches, initializes OBS Studio and lets you press "Start recording" button.
 
 See [this topic](https://obsproject.com/forum/threads/laptop-black-screen-when-capturing-read-here-first.5965/) on how to solve black screen on laptops with two video cards.
 
-Out of the box it works only on Windows.
-
 ## Code of interest
 
 Most of the interesting things are located in [`obsRecorder.js`](./obsRecorder.js). Some snippets are taken verbatim from [obs-studio-node] tests and [streamlabs-obs] source code, but some are results of experiments.
@@ -45,6 +45,8 @@ yarn install
 ```
 
 Start the app from a native terminal, not an integrated terminal like VSCode's.
+
+There is some known issues with MacOS: preview doesn't work ([#23](https://github.com/Envek/obs-studio-node-example/issues/23)), obs64 process doesn't shutdown on app quit ([#22](https://github.com/Envek/obs-studio-node-example/issues/22)), errors in log files ([#18](https://github.com/Envek/obs-studio-node-example/issues/18)). If you can help with those, please fix them and open a pull request!
 
 ## Use with your own build of [obs-studio-node]
 

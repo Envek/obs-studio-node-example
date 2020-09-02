@@ -38,7 +38,7 @@ function createWindow () {
   });
 
   ipcMain.on('preview-bounds', (event, bounds) => {
-    event.returnValue = obsRecorder.resizePreview(bounds);
+    event.returnValue = obsRecorder.resizePreview(win, bounds);
   });
 
   // and load the index.html of the app.

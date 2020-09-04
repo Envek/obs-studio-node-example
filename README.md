@@ -34,6 +34,7 @@ Change link to [obs-studio-node] in your `package.json` to include version of pa
 
 ```
  "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.9.5-release-osx.tar.gz",
+ "node-window-rendering": "https://slobs-node-window-rendering.s3-us-west-2.amazonaws.com/node-window-rendering-1.0.12-osx.tar.gz"
 ```
 
 To get the latest url, clone [streamlabs-obs](https://github.com/stream-labs/streamlabs-obs), run `yarn install` and copy it from the output.
@@ -46,7 +47,11 @@ yarn install
 
 Start the app from a native terminal, not an integrated terminal like VSCode's.
 
-There is some known issues with MacOS: preview doesn't work ([#23](https://github.com/Envek/obs-studio-node-example/issues/23)), obs64 process doesn't shutdown on app quit ([#22](https://github.com/Envek/obs-studio-node-example/issues/22)), errors in log files ([#18](https://github.com/Envek/obs-studio-node-example/issues/18)). If you can help with those, please fix them and open a pull request!
+`node-window-rendering` support MacOS to preview
+
+There is some known issues with MacOS: ~~preview doesn't work ([#23](https://github.com/Envek/obs-studio-node-example/issues/23))~~
+
+obs64 process doesn't shutdown on app quit ([#22](https://github.com/Envek/obs-studio-node-example/issues/22)), errors in log files ([#18](https://github.com/Envek/obs-studio-node-example/issues/18)). If you can help with those, please fix them and open a pull request!
 
 ## Use with your own build of [obs-studio-node]
 

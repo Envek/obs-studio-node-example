@@ -1,10 +1,16 @@
 const path = require('path');
 const { Subject } = require('rxjs');
 const { first } = require('rxjs/operators');
-const { byOS, OS } = require('./operating-systems');
+const { byOS, OS, getOS } = require('./operating-systems');
 
 const osn = require("obs-studio-node");
 const { v4: uuid } = require('uuid');
+let nwr;
+
+// NWR is used to handle display rendering via IOSurface on mac
+if (getOS() === OS.Mac) {
+  nwr = require('node-window-rendering');
+}
 
 let obsInitialized = false;
 let scene = null;
@@ -244,18 +250,40 @@ function setupPreview(window, bounds) {
   // Match padding color with main window background color
   osn.NodeObs.OBS_content_setPaddingColor(displayId, 255, 255, 255);
 
-  return resizePreview(bounds);
+  return resizePreview(window, bounds);
 }
-
-function resizePreview(bounds) {
-  const { aspectRatio, scaleFactor } = displayInfo();
+let existingWindow = false
+let initY = 0
+function resizePreview(window, bounds) {
+  let { aspectRatio, scaleFactor } = displayInfo();
+  if (getOS() === OS.Mac) {
+    scaleFactor = 1
+  }
   const displayWidth = Math.floor(bounds.width);
   const displayHeight = Math.round(displayWidth / aspectRatio);
   const displayX = Math.floor(bounds.x);
   const displayY = Math.floor(bounds.y);
-
+  if (initY === 0) {
+    initY = displayY
+  }
   osn.NodeObs.OBS_content_resizeDisplay(displayId, displayWidth * scaleFactor, displayHeight * scaleFactor);
-  osn.NodeObs.OBS_content_moveDisplay(displayId, displayX * scaleFactor, displayY * scaleFactor);
+
+  if (getOS() === OS.Mac) {
+    if (existingWindow) {
+      nwr.destroyWindow(displayId);
+      nwr.destroyIOSurface(displayId);
+    }
+    const surface = osn.NodeObs.OBS_content_createIOSurface(displayId)
+    nwr.createWindow(
+      displayId,
+      window.getNativeWindowHandle(),
+    );
+    nwr.connectIOSurface(displayId, surface);
+    nwr.moveWindow(displayId, displayX * scaleFactor, (initY - displayY + initY) * scaleFactor)
+    existingWindow = true
+  } else {
+    osn.NodeObs.OBS_content_moveDisplay(displayId, displayX * scaleFactor, displayY * scaleFactor);
+  }
 
   return { height: displayHeight }
 }

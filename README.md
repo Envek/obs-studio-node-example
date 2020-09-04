@@ -47,11 +47,14 @@ yarn install
 
 Start the app from a native terminal, not an integrated terminal like VSCode's.
 
-`node-window-rendering` support MacOS to preview
+`node-window-rendering` is used to support preview for MacOS.
 
-There is some known issues with MacOS: ~~preview doesn't work ([#23](https://github.com/Envek/obs-studio-node-example/issues/23))~~
+There are some known issues with MacOS: 
 
-obs64 process doesn't shutdown on app quit ([#22](https://github.com/Envek/obs-studio-node-example/issues/22)), errors in log files ([#18](https://github.com/Envek/obs-studio-node-example/issues/18)). If you can help with those, please fix them and open a pull request!
+- obs64 process doesn't shutdown on app quit ([#22](https://github.com/Envek/obs-studio-node-example/issues/22))
+- errors in log files ([#18](https://github.com/Envek/obs-studio-node-example/issues/18))
+
+If you can help with those, please fix them and open a pull request!
 
 ## Use with your own build of [obs-studio-node]
 

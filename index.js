@@ -3,16 +3,14 @@ const path = require('path');
 
 const obsRecorder = require('./obsRecorder');
 
-// Replace with ipcMain.handle when obs-studio-node will be ready to work on recent versions of Electron.
-// See https://github.com/stream-labs/obs-studio-node/issues/605
-ipcMain.on('recording-start', (event) => {
+ipcMain.handle('recording-start', (event) => {
   obsRecorder.start();
-  event.returnValue = { recording: true };
+  return { recording: true };
 });
 
-ipcMain.on('recording-stop', (event) => {
+ipcMain.handle('recording-stop', (event) => {
   obsRecorder.stop();
-  event.returnValue = { recording: false };
+  return { recording: false };
 });
 
 app.on('will-quit', obsRecorder.shutdown);
@@ -24,21 +22,22 @@ function createWindow () {
     height: 600,
     autoHideMenuBar: true,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+	  enableRemoteModule: true,
     }
   });
 
-  ipcMain.on('recording-init', (event) => {
+  ipcMain.handle('recording-init', (event) => {
     obsRecorder.initialize(win);
-    event.returnValue = true;
+    return true;
   });
 
-  ipcMain.on('preview-init', (event, bounds) => {
-    event.returnValue = obsRecorder.setupPreview(win, bounds);
+  ipcMain.handle('preview-init', (event, bounds) => {
+    return obsRecorder.setupPreview(win, bounds);
   });
 
-  ipcMain.on('preview-bounds', (event, bounds) => {
-    event.returnValue = obsRecorder.resizePreview(win, bounds);
+  ipcMain.handle('preview-bounds', (event, bounds) => {
+    return obsRecorder.resizePreview(win, bounds);
   });
 
   // and load the index.html of the app.

@@ -1,24 +1,22 @@
 const { ipcRenderer, shell, remote } = require('electron');
 const path = require('path');
 
-function initOBS() {
-  // Replace with await ipcRenderer.invoke when obs-studio-node will be ready to work on recent versions of Electron.
-  // See https://github.com/stream-labs/obs-studio-node/issues/605
-  const result = ipcRenderer.sendSync('recording-init');
+async function initOBS() {
+  const result = await ipcRenderer.invoke('recording-init');
   console.debug("initOBS result:", result);
   if (result) {
     ipcRenderer.on("performanceStatistics", (_event, data) => onPerformanceStatistics(data));
   }
 }
 
-function startRecording() {
-  const result = ipcRenderer.sendSync('recording-start');
+async function startRecording() {
+  const result = await ipcRenderer.invoke('recording-start');
   console.debug("startRecording result:", result);
   return result;
 }
 
-function stopRecording() {
-  const result = ipcRenderer.sendSync('recording-stop');
+async function stopRecording() {
+  const result = await ipcRenderer.invoke('recording-stop');
   console.debug("stopRecording result:", result);
   return result;
 }
@@ -27,11 +25,11 @@ let recording = false;
 let recordingStartedAt = null;
 let timer = null;
 
-function switchRecording() {
+async function switchRecording() {
   if (recording) {
-    recording = stopRecording().recording;
+    recording = (await stopRecording()).recording;
   } else {
-    recording = startRecording().recording;
+    recording = (await startRecording()).recording;
   }
   updateUI();
 }
@@ -68,7 +66,7 @@ function updateTimer() {
 }
 
 function openFolder() {
-  shell.openItem(path.join(__dirname, 'videos'));
+  shell.openPath(path.join(__dirname, 'videos'));
 }
 
 function onPerformanceStatistics(data) {
@@ -82,15 +80,15 @@ function onPerformanceStatistics(data) {
 
 const previewContainer = document.getElementById('preview');
 
-function setupPreview() {
+async function setupPreview() {
   const { width, height, x, y } = previewContainer.getBoundingClientRect();
-  const result = ipcRenderer.sendSync('preview-init', { width, height, x, y });
+  const result = await ipcRenderer.invoke('preview-init', { width, height, x, y });
   previewContainer.style = `height: ${result.height}px`;
 }
 
-function resizePreview() {
+async function resizePreview() {
   const { width, height, x, y } = previewContainer.getBoundingClientRect();
-  const result = ipcRenderer.sendSync('preview-bounds', { width, height, x, y });
+  const result = await ipcRenderer.invoke('preview-bounds', { width, height, x, y });
   previewContainer.style = `height: ${result.height}px`;
 }
 

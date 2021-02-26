@@ -97,6 +97,20 @@ If you can help with those, please fix them and open a pull request!
 
 OBS logs can be found in `osn-data\node-obs\logs`.
 
+## Tips and tricks
+
+### Change webcam resolution
+
+```js
+let settings = obsCameraInput.settings;
+settings['res_type'] = 1
+settings['resolution'] = "1920x1080",
+obsCameraInput.update(settings);
+obsCameraInput.save();
+```
+
+See [#31](https://github.com/Envek/obs-studio-node-example/issues/31) for details.
+
 ## License
 
 As [OBS Studio] itself is published under the terms of GNU GPL version 2, [obs-studio-node] and all application that are using it (including this example application) also have to be open-sourced and published under the terms of GNU GPL version 2 or compatible license. [Read more on tldrlegal.com](https://tldrlegal.com/license/gnu-general-public-license-v2).

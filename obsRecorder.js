@@ -15,6 +15,11 @@ if (getOS() === OS.Mac) {
 let obsInitialized = false;
 let scene = null;
 
+// When packaged, we need to fix some paths
+function fixPathWhenPackaged(p) {
+  return p.replace("app.asar", "app.asar.unpacked");
+}
+
 // Init the library, launch OBS Studio instance, configure it, set up sources and scene
 function initialize(win) {
   if (obsInitialized) {
@@ -38,9 +43,9 @@ function initialize(win) {
 function initOBS() {
   console.debug('Initializing OBS...');
   osn.NodeObs.IPC.host(`obs-studio-node-example-${uuid()}`);
-  osn.NodeObs.SetWorkingDirectory(path.join(__dirname, 'node_modules', 'obs-studio-node'));
+  osn.NodeObs.SetWorkingDirectory(fixPathWhenPackaged(path.join(__dirname, 'node_modules', 'obs-studio-node')));
 
-  const obsDataPath = path.join(__dirname, 'osn-data'); // OBS Studio configs and logs
+  const obsDataPath = fixPathWhenPackaged(path.join(__dirname, 'osn-data')); // OBS Studio configs and logs
   // Arguments: locale, path to directory where configuration and logs will be stored, your application version
   const initResult = osn.NodeObs.OBS_API_initAPI('en-US', obsDataPath, '1.0.0');
 

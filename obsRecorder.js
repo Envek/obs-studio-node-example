@@ -5,6 +5,7 @@ const { byOS, OS, getOS } = require('./operating-systems');
 
 const osn = require("obs-studio-node");
 const { v4: uuid } = require('uuid');
+const videoPath = (require("electron").app).getPath("videos");
 let nwr;
 
 // NWR is used to handle display rendering via IOSurface on mac
@@ -76,7 +77,7 @@ function configureOBS() {
   setSetting('Output', 'Mode', 'Advanced');
   const availableEncoders = getAvailableValues('Output', 'Recording', 'RecEncoder');
   setSetting('Output', 'RecEncoder', availableEncoders.slice(-1)[0] || 'x264');
-  setSetting('Output', 'RecFilePath', path.join(__dirname, 'videos'));
+  setSetting('Output', 'RecFilePath', videoPath);
   setSetting('Output', 'RecFormat', 'mkv');
   setSetting('Output', 'VBitrate', 10000); // 10 Mbps
   setSetting('Video', 'FPSCommon', 60);

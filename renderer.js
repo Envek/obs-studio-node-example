@@ -66,7 +66,7 @@ function updateTimer() {
 }
 
 function openFolder() {
-  shell.openPath(path.join(__dirname, 'videos'));
+  shell.openPath(remote.app.getPath("videos"));
 }
 
 function onPerformanceStatistics(data) {

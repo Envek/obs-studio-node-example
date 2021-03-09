@@ -5,17 +5,26 @@
   "main": "index.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "keywords": [
     "streaming"
   ],
   "author": "",
-  "license": "GPL-2.0",
+  "license": "GPL-2.0",  
+  "dependencies": {
+    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/osn-0.10.10-release-win64.tar.gz",
+    "rxjs": "^6.6.3",
+    "uuid": "^8.3.0"
+  },
   "devDependencies": {
     "electron": "^10.2.0",
-    "rxjs": "^6.6.3",
-    "uuid": "^8.3.0",
-    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/osn-0.10.10-release-win64.tar.gz"
+    "electron-builder": "^22.10.5"
+  },
+  "build": {
+    "appId": "com.demo.obsstudionodeexample"
   }
 }

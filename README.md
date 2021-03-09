@@ -16,9 +16,17 @@ yarn start
 
 or use `F5` in Visual Studio Code.
 
+## Package
+
+```
+yarn dist
+```
+
+You find the generated installer in the dist folder.
+
 ## Current state
 
-It launches, initializes OBS Studio and lets you press "Start recording" button. On recording it captures your desktop video, your webcam picture (if available), audio, and microphone to the video file in `videos/` subfolder. Look at main process' console output.
+ It launches, initializes OBS Studio and lets you press "Start recording" button. On recording it captures your desktop video, your webcam picture (if available), audio, and microphone to the video file in `Videos` folder in your user profile directory. Look at main process' console output.
 
 ![Example application screenshot](./screenshot.png)
 

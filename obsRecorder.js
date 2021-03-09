@@ -5,6 +5,7 @@ const { byOS, OS, getOS } = require('./operating-systems');
 
 const osn = require("obs-studio-node");
 const { v4: uuid } = require('uuid');
+const videoPath = (require("electron").app).getPath("videos");
 let nwr;
 
 // NWR is used to handle display rendering via IOSurface on mac
@@ -14,6 +15,11 @@ if (getOS() === OS.Mac) {
 
 let obsInitialized = false;
 let scene = null;
+
+// When packaged, we need to fix some paths
+function fixPathWhenPackaged(p) {
+  return p.replace("app.asar", "app.asar.unpacked");
+}
 
 // Init the library, launch OBS Studio instance, configure it, set up sources and scene
 function initialize(win) {
@@ -38,9 +44,9 @@ function initialize(win) {
 function initOBS() {
   console.debug('Initializing OBS...');
   osn.NodeObs.IPC.host(`obs-studio-node-example-${uuid()}`);
-  osn.NodeObs.SetWorkingDirectory(path.join(__dirname, 'node_modules', 'obs-studio-node'));
+  osn.NodeObs.SetWorkingDirectory(fixPathWhenPackaged(path.join(__dirname, 'node_modules', 'obs-studio-node')));
 
-  const obsDataPath = path.join(__dirname, 'osn-data'); // OBS Studio configs and logs
+  const obsDataPath = fixPathWhenPackaged(path.join(__dirname, 'osn-data')); // OBS Studio configs and logs
   // Arguments: locale, path to directory where configuration and logs will be stored, your application version
   const initResult = osn.NodeObs.OBS_API_initAPI('en-US', obsDataPath, '1.0.0');
 
@@ -71,7 +77,7 @@ function configureOBS() {
   setSetting('Output', 'Mode', 'Advanced');
   const availableEncoders = getAvailableValues('Output', 'Recording', 'RecEncoder');
   setSetting('Output', 'RecEncoder', availableEncoders.slice(-1)[0] || 'x264');
-  setSetting('Output', 'RecFilePath', path.join(__dirname, 'videos'));
+  setSetting('Output', 'RecFilePath', videoPath);
   setSetting('Output', 'RecFormat', 'mkv');
   setSetting('Output', 'VBitrate', 10000); // 10 Mbps
   setSetting('Video', 'FPSCommon', 60);

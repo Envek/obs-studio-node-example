@@ -36,6 +36,9 @@ See [this topic](https://obsproject.com/forum/threads/laptop-black-screen-when-c
 
 Most of the interesting things are located in [`obsRecorder.js`](./obsRecorder.js). Some snippets are taken verbatim from [obs-studio-node] tests and [streamlabs-obs] source code, but some are results of experiments.
 
+## Documentation
+You can find some basic documentation [here](https://github.com/hrueger/obs-studio-node-docs/blob/main/docs/index.md).
+
 ## Run on MacOS
 
 Change link to [obs-studio-node] in your `package.json` to include version of package built for MacOS:

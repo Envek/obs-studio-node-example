@@ -85,6 +85,32 @@ function configureOBS() {
   console.debug('OBS Configured');
 }
 
+function isVirtualCamPluginInstalled() {
+  return osn.NodeObs.OBS_service_isVirtualCamPluginInstalled();
+}
+
+function installVirtualCamPlugin() {
+  osn.NodeObs.OBS_service_installVirtualCamPlugin();
+  return osn.NodeObs.OBS_service_isVirtualCamPluginInstalled();
+}
+
+function uninstallVirtualCamPlugin() {
+  osn.NodeObs.OBS_service_uninstallVirtualCamPlugin();
+  return !osn.NodeObs.OBS_service_isVirtualCamPluginInstalled();
+}
+
+function startVirtualCam() {
+  osn.NodeObs.OBS_service_createVirtualWebcam("obs-studio-node-example-cam");
+  osn.NodeObs.OBS_service_startVirtualWebcam();
+}
+
+function stopVirtualCam() {
+  osn.NodeObs.OBS_service_stopVirtualWebcam();
+  osn.NodeObs.OBS_service_removeVirtualWebcam();
+}
+
+
+
 // Get information about prinary display
 function displayInfo() {
   const { screen } = require('electron');
@@ -414,6 +440,11 @@ function busySleep(sleepDuration) {
 
 module.exports.initialize = initialize;
 module.exports.start = start;
+module.exports.isVirtualCamPluginInstalled = isVirtualCamPluginInstalled;
+module.exports.installVirtualCamPlugin = installVirtualCamPlugin;
+module.exports.uninstallVirtualCamPlugin = uninstallVirtualCamPlugin;
+module.exports.startVirtualCam = startVirtualCam;
+module.exports.stopVirtualCam = stopVirtualCam;
 module.exports.stop = stop;
 module.exports.shutdown = shutdown;
 module.exports.setupPreview = setupPreview;

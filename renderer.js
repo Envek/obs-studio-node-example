@@ -22,6 +22,7 @@ async function stopRecording() {
 }
 
 let recording = false;
+let virtualCamRunning = false;
 let recordingStartedAt = null;
 let timer = null;
 
@@ -31,10 +32,10 @@ async function switchRecording() {
   } else {
     recording = (await startRecording()).recording;
   }
-  updateUI();
+  updateRecordingUI();
 }
 
-function updateUI() {
+function updateRecordingUI() {
   const button = document.getElementById('rec-button');
   button.disabled = false;
   if (recording) {
@@ -44,6 +45,51 @@ function updateUI() {
     button.innerText = '⏺️ Start recording'
     stopTimer();
   }
+}
+
+async function updateVirtualCamUI() {
+  if (await ipcRenderer.invoke('isVirtualCamPluginInstalled')) {
+    document.querySelector("#install-virtual-cam-plugin-button").style.display = "none";
+    if (virtualCamRunning) {
+      document.querySelector("#virtual-cam-plugin-status").innerText = "Running";
+      document.querySelector("#stop-virtual-cam-button").style.display = "";
+      document.querySelector("#start-virtual-cam-button").style.display = "none";
+      document.querySelector("#uninstall-virtual-cam-plugin-button").style.display = "none";
+    } else {
+      document.querySelector("#virtual-cam-plugin-status").innerText = "Plugin installed";
+      document.querySelector("#stop-virtual-cam-button").style.display = "none";
+      document.querySelector("#start-virtual-cam-button").style.display = "";
+      document.querySelector("#uninstall-virtual-cam-plugin-button").style.display = "";
+    }
+  } else {
+    document.querySelector("#virtual-cam-plugin-status").innerText = "Plugin not installed";
+    document.querySelector("#install-virtual-cam-plugin-button").style.display = "";
+    document.querySelector("#uninstall-virtual-cam-plugin-button").style.display = "none";
+    document.querySelector("#start-virtual-cam-button").style.display = "none";
+    document.querySelector("#stop-virtual-cam-button").style.display = "none";
+  }
+}
+
+async function uninstallVirtualCamPlugin() {
+  await ipcRenderer.invoke('uninstallVirtualCamPlugin');
+  updateVirtualCamUI();
+}
+
+async function installVirtualCamPlugin() {
+  await ipcRenderer.invoke('installVirtualCamPlugin');
+  updateVirtualCamUI();
+}
+
+async function startVirtualCam() {
+  await ipcRenderer.invoke('startVirtualCam');
+  virtualCamRunning = true;
+  updateVirtualCamUI();
+}
+
+async function stopVirtualCam() {
+  await ipcRenderer.invoke('stopVirtualCam');
+  virtualCamRunning = false;
+  updateVirtualCamUI();
 }
 
 function startTimer() {
@@ -101,7 +147,8 @@ ro.observe(document.querySelector("#preview"));
 try {
   initOBS();
   setupPreview();
-  updateUI();
+  updateRecordingUI();
+  updateVirtualCamUI();
 } catch (err) {
   console.log(err)
 }

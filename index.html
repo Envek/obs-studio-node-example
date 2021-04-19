@@ -19,18 +19,38 @@
         border-top: 1px solid rgb(165, 165, 165);
         padding: .5rem;
       }
+      .d-block {
+        display: block;
+      }
+      .border {
+        border: 1px solid grey;
+        border-radius: 1rem;
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+      }
     </style>
   </head>
   <body>
     <h1>Hello from OBS Studio Node!</h1>
 
-    <button id="rec-button" onclick="switchRecording()">
-      ⏳ Initializing, please wait...
-    </button>
-
-    <span id="rec-timer">0:00:00.0</span>
-
-    <button title="Open folder with videos" onclick="openFolder()">📂</button>
+    <div class="d-block border">
+      <b>Recording:</b><br>
+      <button id="rec-button" onclick="switchRecording()">
+        ⏳ Initializing, please wait...
+      </button>
+      
+      <span id="rec-timer">0:00:00.0</span>
+      
+      <button title="Open folder with videos" onclick="openFolder()">📂</button>
+    </div>
+    <div class="d-block border">
+      <b>Virtual Camera:</b><br>
+      <button id="install-virtual-cam-plugin-button" onclick="installVirtualCamPlugin()">Install Plugin</button>
+      <button id="uninstall-virtual-cam-plugin-button" onclick="uninstallVirtualCamPlugin()">Uninstall Plugin</button>
+      <button id="start-virtual-cam-button" onclick="startVirtualCam()">Start Virtual Camera</button>
+      <button id="stop-virtual-cam-button" onclick="stopVirtualCam()">Stop Virtual Camera</button>
+      <span id="virtual-cam-plugin-status">...</span>
+    </div>
 
     <div id="preview">
       Initializing...

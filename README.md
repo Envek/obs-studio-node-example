@@ -32,6 +32,13 @@ You find the generated installer in the dist folder.
 
 See [this topic](https://obsproject.com/forum/threads/laptop-black-screen-when-capturing-read-here-first.5965/) on how to solve black screen on laptops with two video cards.
 
+### Virtual Camera
+After clicking the `Install Plugin` and the `Start Virtual Camera` button, a new webcam will be available for you to use in any other program (like Zoom or Microsoft Teams).
+
+It will output exactly the same content which is displayed in the preview, in this case, it's the screen recording and maybe your webcam.
+
+However, the webcam shows up as `Streamlabs OBS Virtual Camera` and we can't change the name for now (see [#44](https://github.com/Envek/obs-studio-node-example/issues/44)).
+
 ## Code of interest
 
 Most of the interesting things are located in [`obsRecorder.js`](./obsRecorder.js). Some snippets are taken verbatim from [obs-studio-node] tests and [streamlabs-obs] source code, but some are results of experiments.

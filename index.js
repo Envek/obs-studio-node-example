@@ -13,6 +13,22 @@ ipcMain.handle('recording-stop', (event) => {
   return { recording: false };
 });
 
+ipcMain.handle('isVirtualCamPluginInstalled', (event) => {
+  return obsRecorder.isVirtualCamPluginInstalled();
+});
+ipcMain.handle('startVirtualCam', (event) => {
+  return obsRecorder.startVirtualCam();
+});
+ipcMain.handle('stopVirtualCam', (event) => {
+  return obsRecorder.stopVirtualCam();
+});
+ipcMain.handle('installVirtualCamPlugin', (event) => {
+  return obsRecorder.installVirtualCamPlugin();
+});
+ipcMain.handle('uninstallVirtualCamPlugin', (event) => {
+  return obsRecorder.uninstallVirtualCamPlugin();
+});
+
 app.on('will-quit', obsRecorder.shutdown);
 
 function createWindow () {

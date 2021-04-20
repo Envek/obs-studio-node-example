@@ -1300,9 +1300,9 @@ object-keys@^1.0.12:
   resolved "https://registry.yarnpkg.com/object-keys/-/object-keys-1.1.1.tgz#1c47f272df277f3b1daf061677d9c82e2322c60e"
   integrity sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/osn-0.10.10-release-win64.tar.gz":
-  version "0.10.10"
-  resolved "https://obsstudionodes3.streamlabs.com/osn-0.10.10-release-win64.tar.gz#0306ea8427827d579f5ae471ebab01a6d9d80598"
+"obs-studio-node@https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.15.6-release-win64.tar.gz":
+  version "0.15.6"
+  resolved "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.15.6-release-win64.tar.gz#dc8643c6ff0539d0df39a8293c959d0dcd038979"
 
 once@^1.3.0, once@^1.3.1, once@^1.4.0:
   version "1.4.0"

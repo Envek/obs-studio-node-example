@@ -31,7 +31,6 @@ function initialize(win) {
   initOBS();
   configureOBS();
   scene = setupScene();
-  setupSources(scene);
   obsInitialized = true;
 
   const perfStatTimer = setInterval(() => {
@@ -211,12 +210,11 @@ function setupScene() {
   const outputHeight = Math.round(outputWidth / aspectRatio);
   setSetting('Video', 'Base', `${outputWidth}x${outputHeight}`);
   setSetting('Video', 'Output', `${outputWidth}x${outputHeight}`);
-  const videoScaleFactor = physicalWidth / outputWidth;
+  
 
   // A scene is necessary here to properly scale captured screen size to output video size
   const scene = osn.SceneFactory.create('test-scene');
   const sceneItem = scene.add(videoSource);
-  sceneItem.scale = { x: 1.0/ videoScaleFactor, y: 1.0 / videoScaleFactor };
 
   // If camera is available, make it 1/3 width of video and place it to right down corner of display
   const cameraSource = getCameraSource();
@@ -229,6 +227,15 @@ function setupScene() {
       y: outputHeight - cameraSource.height * cameraScaleFactor - outputHeight / 10,
     };
   }
+
+  // Set all the output source
+  setupSources(scene)
+
+  // Properly scale the video scene using the resolution off whatever monitor is used
+  // The source width is only available after it is set as an output source
+  const realDisplayWidth = osn.Global.getOutputSource(1).source.width;
+  const videoScaleFactor = realDisplayWidth / outputWidth;
+  sceneItem.scale = { x: 1.0 / videoScaleFactor, y: 1.0 / videoScaleFactor };
 
   return scene;
 }
